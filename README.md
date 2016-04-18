@@ -1,4 +1,4 @@
-# toolbox
+# git-wraps
 
-Personal toolbox for shell and scripting or whatever.
+Wrapper commands of git CLI mainly for personal use.
 
