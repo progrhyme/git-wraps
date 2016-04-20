@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
 git-pulls "$@"
-git-submodule-all-pull
+if [[ -f .gitmodules ]]; then
+  git-submodule-all-pull
+fi
