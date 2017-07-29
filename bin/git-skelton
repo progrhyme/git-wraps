@@ -9,7 +9,7 @@ create() {
   git init
   echo "# $prj" > README.md
   cat <<EOS > .gitignore
-*.swp
+*.sw[pon]
 /tmp/
 EOS
   git add .
