@@ -1,19 +1,19 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -eu
+set -eux
 
 create() {
   local prj=$1
+
   mkdir $prj
   cd $prj
   git init
+  git commit --allow-empty -m "Initial commit"
+
   echo "# $prj" > README.md
-  cat <<EOS > .gitignore
-*.sw[pon]
-/tmp/
-EOS
   git add .
-  git commit -m "1st commit"
 }
 
 create $1
+
+exit
