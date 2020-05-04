@@ -7,6 +7,23 @@ INTERACTIVE=${INTERACTIVE:-}
 
 current=$(git rev-parse --abbrev-ref HEAD)
 
+help() {
+  pod2text $0
+  exit 1
+}
+
+# ============================================================
+# Parse Arguments
+
+for opt in "$@"; do
+  case "$opt" in
+    "-i" ) INTERACTIVE=1 ;;
+    "-p" | "--pull" ) PULL=1 ;;
+    "-h" | "--help" ) help ;;
+    * ) ;;
+  esac
+done
+
 if [[ -n "${PULL}" ]]; then
   git pull --prune
 fi
@@ -24,3 +41,47 @@ for br in $(git branch --merged | grep -v "develop\|master\|${current}"); do
 done
 
 exit
+
+: <<'__EOF__'
+
+=encoding utf8
+
+=head1 NAME
+
+B<git-branch-sweep> - git subcommand to clean up merged local branches
+
+=head1 SYNOPSYS
+
+    # Basic execution
+    git branch-sweep
+
+    # Interactive mode
+    git branch-sweep -i
+
+    # pull before sweep
+    git branch-sweep -p|--pull
+
+    # Specify both options
+    git branch-sweep -i -p
+
+Help:
+
+    git branch-sweep -h|--help
+
+=head1 DESCRIPTION
+
+git subcommand to clean up merged local branches
+
+=head1 AUTHORS
+
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
+
+=head1 LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) 2020 IKEDA Kiyoshi
+
+=cut
+
+__EOF__
