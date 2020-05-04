@@ -5,8 +5,6 @@ set -euo pipefail
 PULL=${PULL:-}
 INTERACTIVE=${INTERACTIVE:-}
 
-current=$(git rev-parse --abbrev-ref HEAD)
-
 help() {
   pod2text $0
   exit 1
@@ -23,6 +21,9 @@ for opt in "$@"; do
     * ) ;;
   esac
 done
+
+# working branch
+current=$(git rev-parse --abbrev-ref HEAD)
 
 if [[ -n "${PULL}" ]]; then
   git pull --prune
