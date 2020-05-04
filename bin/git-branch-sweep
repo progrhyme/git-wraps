@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PULL=${PULL:-}
+INTERACTIVE=${INTERACTIVE:-}
+
+current=$(git rev-parse --abbrev-ref HEAD)
+
+if [[ -n "${PULL}" ]]; then
+  git pull --prune
+fi
+
+for br in $(git branch --merged | grep -v "develop\|master\|${current}"); do
+  if [[ -n "${INTERACTIVE}" ]]; then
+    echo -n "Delete ${br} ? (y/N) "
+    read answer
+    if [[ "$answer" != "y" ]]; then
+      echo "Canceled."
+      continue
+    fi
+  fi
+  git branch -d $br
+done
+
+exit
