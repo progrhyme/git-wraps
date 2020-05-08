@@ -2,8 +2,11 @@
 
 set -euo pipefail
 
+# Option variables
 PULL=${PULL:-}
 INTERACTIVE=${INTERACTIVE:-}
+VERBOSE=${VERBOSE:-}
+GIT_BRANCH_SWEEP_WHITELIST=${GIT_BRANCH_SWEEP_WHITELIST:-}
 
 help() {
   pod2text $0
@@ -22,14 +25,27 @@ for opt in "$@"; do
   esac
 done
 
+if [[ -z "${GIT_BRANCH_SWEEP_WHITELIST}" ]]; then
+  GIT_BRANCH_SWEEP_WHITELIST=(master develop)
+fi
+
 # working branch
 current=$(git rev-parse --abbrev-ref HEAD)
+GIT_BRANCH_SWEEP_WHITELIST+=($current)
 
 if [[ -n "${PULL}" ]]; then
   git pull --prune
 fi
 
-for br in $(git branch --merged | grep -v "develop\|master\|${current}"); do
+for br in $(git branch --format="%(refname:short)" --merged); do
+  for _br in ${GIT_BRANCH_SWEEP_WHITELIST[@]}; do
+    if [[ "$br" = "$_br" ]]; then
+      if [[ -n "$VERBOSE" ]]; then
+        echo "Branch \"${_br}\" is whitelisted. Skip."
+      fi
+      continue 2
+    fi
+  done
   if [[ -n "${INTERACTIVE}" ]]; then
     echo -n "Delete ${br} ? (y/N) "
     read answer
