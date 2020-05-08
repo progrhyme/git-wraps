@@ -18,9 +18,10 @@ help() {
 
 for opt in "$@"; do
   case "$opt" in
-    "-i" ) INTERACTIVE=1 ;;
-    "-p" | "--pull" ) PULL=1 ;;
-    "-h" | "--help" ) help ;;
+    "-i" ) INTERACTIVE=on ;;
+    "-p" | "--pull"    ) PULL=on ;;
+    "-v" | "--verbose" ) VERBOSE=on ;;
+    "-h" | "--help"    ) help ;;
     * ) ;;
   esac
 done
@@ -69,25 +70,33 @@ B<git-branch-sweep> - git subcommand to clean up merged local branches
 
 =head1 SYNOPSYS
 
-    # Basic execution
-    git branch-sweep
-
-    # Interactive mode
-    git branch-sweep -i
-
-    # pull before sweep
-    git branch-sweep -p|--pull
-
-    # Specify both options
-    git branch-sweep -i -p
-
-Help:
-
-    git branch-sweep -h|--help
+    git branch-sweep [OPTIONS]
 
 =head1 DESCRIPTION
 
 git subcommand to clean up merged local branches
+
+=head1 OPTIONS
+
+=over
+
+=item B<-i>
+
+Interactive mode. Show prompt before deleting branch.
+
+=item B<-p|--pull>
+
+Execute C<git pull --prune> before deleting branches.
+
+=item B<-v|--verbose>
+
+Verbose output.
+
+=item B<-h|--help>
+
+Show help text.
+
+=back
 
 =head1 AUTHORS
 
