@@ -8,21 +8,55 @@ INTERACTIVE=${INTERACTIVE:-}
 VERBOSE=${VERBOSE:-}
 GIT_BRANCH_CLEAN_WHITELIST=${GIT_BRANCH_CLEAN_WHITELIST:-}
 
+# ============================================================
+# Functions
+
 help() {
   pod2text $0
   exit 1
+}
+
+add_whitelist() {
+  local branch=$1
+  if [[ -z "${GIT_BRANCH_CLEAN_WHITELIST}" ]]; then
+    GIT_BRANCH_CLEAN_WHITELIST=()
+  fi
+  GIT_BRANCH_CLEAN_WHITELIST+=($branch)
 }
 
 # ============================================================
 # Parse Arguments
 
 for opt in "$@"; do
-  case "$opt" in
-    "-i" ) INTERACTIVE=on ;;
-    "-p" | "--pull"    ) PULL=on ;;
-    "-v" | "--verbose" ) VERBOSE=on ;;
-    "-h" | "--help"    ) help ;;
-    * ) ;;
+  case "${1:-}" in
+    "-i" )
+      INTERACTIVE=on
+      shift
+      ;;
+    "-p" | "--pull" )
+      PULL=on
+      shift
+      ;;
+    "-a" | "--allow" )
+      if [[ -z $2 || "$2" =~ ^-+ ]]; then
+        help
+      else
+        add_whitelist $2
+        shift 2
+      fi
+      ;;
+    "-v" | "--verbose" )
+      VERBOSE=on
+      shift
+      ;;
+    "-h" | "--help" )
+      help
+      ;;
+    * )
+      if [[ -n "${1:-}" ]]; then
+        shift
+      fi
+      ;;
   esac
 done
 
@@ -33,6 +67,9 @@ fi
 # working branch
 current=$(git rev-parse --abbrev-ref HEAD)
 GIT_BRANCH_CLEAN_WHITELIST+=($current)
+
+# ============================================================
+# Main Entry
 
 if [[ -n "${PULL}" ]]; then
   git pull --prune
@@ -74,7 +111,12 @@ B<git-branch-clean> - git subcommand to clean up merged local branches
 
 =head1 DESCRIPTION
 
-git subcommand to clean up merged local branches
+This is a git subcommand to clean up merged local branches.
+
+Branches "master" and "develop" are whitelisted by default.
+You can change the whitelist by C<-a|--allow BRANCH> option. 
+
+Current branch is always whitelisted.
 
 =head1 OPTIONS
 
@@ -83,6 +125,22 @@ git subcommand to clean up merged local branches
 =item B<-i>
 
 Interactive mode. Show prompt before deleting branch.
+
+=item B<-a|--allow BRANCH>
+
+Add argument as branch name to whitelist which won't be deleted.
+This option can be specified multiple times.
+
+Ex)
+
+    # Whitelist = (develop, master, CURRENT)
+    git branch-clean
+
+    # Whitelist = (foo, CURRENT)
+    git branch-clean -a foo
+
+    # Whitelist = (test, master, CURRENT)
+    git branch-clean -a test -a master
 
 =item B<-p|--pull>
 
