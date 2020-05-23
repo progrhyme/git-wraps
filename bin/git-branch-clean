@@ -60,7 +60,9 @@ for opt in "$@"; do
   esac
 done
 
-if [[ -z "${GIT_BRANCH_CLEAN_WHITELIST}" ]]; then
+if [[ -n "${GIT_BRANCH_CLEAN_WHITELIST}" ]]; then
+  GIT_BRANCH_CLEAN_WHITELIST=(${GIT_BRANCH_CLEAN_WHITELIST//,/ })
+else
   GIT_BRANCH_CLEAN_WHITELIST=(master develop)
 fi
 
