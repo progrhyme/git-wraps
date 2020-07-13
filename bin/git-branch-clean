@@ -6,7 +6,7 @@ set -euo pipefail
 PULL=${PULL:-}
 INTERACTIVE=${INTERACTIVE:-}
 VERBOSE=${VERBOSE:-}
-GIT_BRANCH_CLEAN_WHITELIST=${GIT_BRANCH_CLEAN_WHITELIST:-}
+GIT_BRANCH_CLEAN_ALLOWLIST=${GIT_BRANCH_CLEAN_ALLOWLIST:-}
 
 # ============================================================
 # Functions
@@ -16,12 +16,12 @@ help() {
   exit 1
 }
 
-add_whitelist() {
+add_allowlist() {
   local branch=$1
-  if [[ -z "${GIT_BRANCH_CLEAN_WHITELIST}" ]]; then
-    GIT_BRANCH_CLEAN_WHITELIST=()
+  if [[ -z "${GIT_BRANCH_CLEAN_ALLOWLIST}" ]]; then
+    GIT_BRANCH_CLEAN_ALLOWLIST=()
   fi
-  GIT_BRANCH_CLEAN_WHITELIST+=($branch)
+  GIT_BRANCH_CLEAN_ALLOWLIST+=($branch)
 }
 
 # ============================================================
@@ -41,7 +41,7 @@ for opt in "$@"; do
       if [[ -z $2 || "$2" =~ ^-+ ]]; then
         help
       else
-        add_whitelist $2
+        add_allowlist $2
         shift 2
       fi
       ;;
@@ -60,15 +60,15 @@ for opt in "$@"; do
   esac
 done
 
-if [[ -n "${GIT_BRANCH_CLEAN_WHITELIST}" ]]; then
-  GIT_BRANCH_CLEAN_WHITELIST=(${GIT_BRANCH_CLEAN_WHITELIST//,/ })
+if [[ -n "${GIT_BRANCH_CLEAN_ALLOWLIST}" ]]; then
+  GIT_BRANCH_CLEAN_ALLOWLIST=(${GIT_BRANCH_CLEAN_ALLOWLIST//,/ })
 else
-  GIT_BRANCH_CLEAN_WHITELIST=(master develop)
+  GIT_BRANCH_CLEAN_ALLOWLIST=(master develop)
 fi
 
 # working branch
 current=$(git rev-parse --abbrev-ref HEAD)
-GIT_BRANCH_CLEAN_WHITELIST+=($current)
+GIT_BRANCH_CLEAN_ALLOWLIST+=($current)
 
 # ============================================================
 # Main Entry
@@ -78,10 +78,10 @@ if [[ -n "${PULL}" ]]; then
 fi
 
 for br in $(git branch --format="%(refname:short)" --merged); do
-  for _br in ${GIT_BRANCH_CLEAN_WHITELIST[@]}; do
+  for _br in ${GIT_BRANCH_CLEAN_ALLOWLIST[@]}; do
     if [[ "$br" = "$_br" ]]; then
       if [[ -n "$VERBOSE" ]]; then
-        echo "Branch \"${_br}\" is whitelisted. Skip."
+        echo "Branch \"${_br}\" is allowed. Skip."
       fi
       continue 2
     fi
@@ -115,10 +115,10 @@ B<git-branch-clean> - git subcommand to clean up merged local branches
 
 This is a git subcommand to clean up merged local branches.
 
-Branches "master" and "develop" are whitelisted by default.
-You can change the whitelist by C<-a|--allow BRANCH> option. 
+Branches "master" and "develop" are allowed by default.
+You can change the allowlist by C<-a|--allow BRANCH> option. 
 
-Current branch is always whitelisted.
+Current branch is always allowed.
 
 =head1 OPTIONS
 
@@ -130,18 +130,18 @@ Interactive mode. Show prompt before deleting branch.
 
 =item B<-a|--allow BRANCH>
 
-Add argument as branch name to whitelist which won't be deleted.
+Add argument as branch name to allowlist which won't be deleted.
 This option can be specified multiple times.
 
 Ex)
 
-    # Whitelist = (develop, master, CURRENT)
+    # Allowlist = (develop, master, CURRENT)
     git branch-clean
 
-    # Whitelist = (foo, CURRENT)
+    # Allowlist = (foo, CURRENT)
     git branch-clean -a foo
 
-    # Whitelist = (test, master, CURRENT)
+    # Allowlist = (test, master, CURRENT)
     git branch-clean -a test -a master
 
 =item B<-p|--pull>
