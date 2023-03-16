@@ -63,7 +63,7 @@ done
 if [[ -n "${GIT_BRANCH_CLEAN_ALLOWLIST}" ]]; then
   GIT_BRANCH_CLEAN_ALLOWLIST=(${GIT_BRANCH_CLEAN_ALLOWLIST//,/ })
 else
-  GIT_BRANCH_CLEAN_ALLOWLIST=(master develop)
+  GIT_BRANCH_CLEAN_ALLOWLIST=(master develop main)
 fi
 
 # working branch
